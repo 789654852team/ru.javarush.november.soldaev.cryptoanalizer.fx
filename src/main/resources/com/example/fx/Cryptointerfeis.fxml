@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<TabPane maxHeight="-Infinity"
+         maxWidth="-Infinity"
+         minHeight="400.0"
+         minWidth="600.0"
+         prefHeight="400.0"
+         prefWidth="600.0"
+         tabClosingPolicy="UNAVAILABLE"
+         xmlns:fx="http://javafx.com/fxml/1"
+         fx:controller="com.example.fx.HelloController"
+         xmlns="http://javafx.com/javafx/18">
+
+  <tabs>
+    <Tab text="Зашифровка">
+      <content>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <Text fill="#000000d4" layoutX="14.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Шифровка методом Цезаря">
+                     <font>
+                        <Font name="System Bold" size="25.0" />
+                     </font>
+                  </Text>
+                  <Line disable="true" endX="499.0" layoutX="101.0" layoutY="62.0" startX="-101.0" stroke="#f7d80f" strokeWidth="10.0" AnchorPane.bottomAnchor="300.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
+                  <Text layoutX="14.0" layoutY="117.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Выбирите файл :">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Text>
+
+                  <Button layoutX="177.0" layoutY="96.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="100.0" text="Выбрать файл"
+                          onAction="#ChoosePathEncryp"/>
+
+                  <Text layoutX="14.0" layoutY="190.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Выберете язык: ">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Text>
+
+                  <Button layoutX="177.0" layoutY="173.0" mnemonicParsing="false" text="RU"
+                          onAction="#selectionLangRU"/>
+                  <Button layoutX="227.0" layoutY="173.0" mnemonicParsing="false" text="EN"
+                          onAction="#selectionLangEN"/>
+
+                  <Text fill="#f50808" layoutX="14.0" layoutY="220.0" strokeType="OUTSIDE" strokeWidth="0.0" fx:id="notLangEncryp">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Text>
+
+                  <Text layoutX="14.0" layoutY="252.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Введите ключ: ">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Text>
+
+                  <TextField layoutX="177.0" layoutY="233.0"
+                  fx:id="userKey"/>
+                  <Button layoutX="177.0" layoutY="287.0" mnemonicParsing="false" prefHeight="66.0" prefWidth="150.0" text="Зашифровать"
+                           onAction="#makeEncryption"/>
+
+                  <ImageView fitHeight="156.0" fitWidth="223.0" layoutX="343.0" layoutY="87.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="140.0" AnchorPane.leftAnchor="340.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="80.0">
+                     <image>
+                        <Image url="@kisspng-computer.jpg" />
+                     </image>
+                  </ImageView>
+
+                  <Text fill="#f50808" layoutX="14.0" layoutY="151.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                        fx:id="errorPathEncryp">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Text>
+                  <Text fill="#f50808" layoutX="14.0" layoutY="280.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                        fx:id="isEmtyKeyEncryp">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Text>
+                  <Text fill="#f50808" layoutX="340.0" layoutY="326.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                        fx:id="notStartEncryp">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Text>
+
+               </children></AnchorPane>
+      </content>
+    </Tab>
+      <Tab text="Расшифровка">
+         <content>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <Text fill="#000000d4" layoutX="14.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Расшифровка метода Цезаря по ключу">
+                     <font>
+                        <Font name="System Bold" size="25.0" />
+                     </font>
+                  </Text>
+                  <Line disable="true" endX="499.0" layoutX="101.0" layoutY="62.0" startX="-101.0" stroke="#f7d80f" strokeWidth="10.0" AnchorPane.bottomAnchor="300.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
+                  <Text layoutX="14.0" layoutY="117.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Выбирите файл :">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Text>
+                  <Button layoutX="177.0" layoutY="96.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="100.0" text="Выбрать файл"
+                          onAction="#ChoosePathEncryp"/>
+                  <Text layoutX="14.0" layoutY="190.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Выберете язык: ">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Text>
+                  <Button layoutX="177.0" layoutY="173.0" mnemonicParsing="false" text="RU"
+                          onAction="#selectionLangRU"/>
+                  <Button layoutX="227.0" layoutY="173.0" mnemonicParsing="false" text="EN"
+                          onAction="#selectionLangEN"/>
+                  <Text fill="#f50808" layoutX="14.0" layoutY="220.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                        fx:id="notLangDecryp">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Text>
+                  <Text layoutX="14.0" layoutY="252.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Введите ключ: ">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Text>
+                  <TextField layoutX="177.0" layoutY="233.0"
+                             fx:id="userKeyDecryp"/>
+                  <Button layoutX="177.0" layoutY="287.0" mnemonicParsing="false" prefHeight="66.0" prefWidth="150.0" text="Расшифровать"
+                          onAction="#makeDecryption"/>
+                  <ImageView fitHeight="156.0" fitWidth="223.0" layoutX="345.0" layoutY="83.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="140.0" AnchorPane.leftAnchor="340.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="80.0">
+                     <image>
+                        <Image url="@kisspng-computer.jpg" />
+                     </image>
+                  </ImageView>
+                  <Text fill="#f20606" layoutX="14.0" layoutY="153.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                        fx:id="errorPathDecryp">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Text>
+                  <Text fill="#f20606" layoutX="14.0" layoutY="282.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                        fx:id="isEmtyKeyDecryp">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Text>
+                  <Text fill="#f20606" layoutX="340.0" layoutY="326.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                        fx:id="notStartDecryp">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Text>
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+      <Tab text="Brute force">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <Line endX="499.0" layoutX="101.0" layoutY="78.0" startX="-100.0" stroke="#f7d80f" strokeWidth="10.0" AnchorPane.bottomAnchor="300.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="60.0" />
+                  <Text layoutX="14.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Расшифровка без ключа">
+                     <font>
+                        <Font name="System Bold" size="25.0" />
+                     </font>
+                  </Text>
+                  <Text layoutX="14.0" layoutY="103.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Выберете файл:">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Text>
+                  <Button layoutX="166.0" layoutY="79.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="109.0" text="Выберете файл"
+                          onAction="#ChoosePathEncryp"/>
+                  <Text layoutX="14.0" layoutY="164.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Выберете язык:">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Text>
+                  <Button layoutX="166.0" layoutY="140.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="51.0" text="RU"
+                          onAction="#selectionLangRU"/>
+                  <Button layoutX="231.0" layoutY="140.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="50.0" text="EN"
+                          onAction="#selectionLangEN"/>
+                  <Text fill="#f50808" layoutX="14.0" layoutY="185.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                        fx:id="notLangBrutfors">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Text>
+                  <Button layoutX="14.0" layoutY="193.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="269.0" text="Начать Brute force"
+                          onAction="#makeBrutfors"/>
+                  <Text layoutX="15.0" layoutY="279.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Пердпологаемый ключ:">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Text>
+                  <Text layoutX="247.0" layoutY="279.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                        fx:id="brutforsKey">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Text>
+                  <ImageView fitHeight="156.0" fitWidth="223.0" layoutX="341.0" layoutY="76.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="140.0" AnchorPane.leftAnchor="340.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="80.0">
+                     <image>
+                        <Image url="@kisspng-computer.jpg" />
+                     </image>
+                  </ImageView>
+                  <Text fill="#f20a0a" layoutX="14.0" layoutY="135.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                        fx:id="errorPathBrutfors">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Text>
+                  <Text fill="#f20606" layoutX="14.0" layoutY="250.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                        fx:id="notStartBrutfors">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Text>
+               </children>
+            </AnchorPane>
+        </content>
+      </Tab>
+  </tabs>
+</TabPane>
