@@ -9,6 +9,10 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 
 public class Cryptomethods {
+    private static final int LENGTHALPHADETRU = 77;
+    private static final int LENGTHALPHADETEN = 63;
+    private static final int sizeBuffers = 2654;
+    private static final int MAXUSERKEY = 60;
     private static final Path ALPHADETRU = Path.of("src/needtext/alfafitru.txt");
     private static final Path ALPHADETEN = Path.of("src/needtext/alfafiten.txt");
     private static String newNeme;
@@ -18,7 +22,7 @@ public class Cryptomethods {
 
     public static int brutforsKey = 1;
 
-    public static void toBrutfors (File inFiles, String Language, String whoColled) throws IOException {
+    public static void toBrutfors(File inFiles, String Language, String whoColled) throws IOException {
         createAlphabet(Language);
         File inFile = inFiles;
 
@@ -26,7 +30,7 @@ public class Cryptomethods {
 
 
             long count = inFileChannel.size();
-            int sizeBuff = 2654;
+            int sizeBuff = sizeBuffers;
             StringBuilder builderBrutforse = new StringBuilder();
 
             ByteBuffer buffer = ByteBuffer.allocate(sizeBuff);
@@ -34,7 +38,7 @@ public class Cryptomethods {
             buffer.flip();
 
             while (buffer.hasRemaining()) {
-                // перекодируем в формат UTF_8
+
                 builderBrutforse.append(StandardCharsets.UTF_8.decode(buffer));
             }
 
@@ -64,7 +68,7 @@ public class Cryptomethods {
                     builderBrutforse.delete(0, sizeBuff);
                     buffer.clear();
                     createEncryptAndDecryptTables(brutforsKey, whoColled);
-                    toBrutfors(inFiles,Language, whoColled);
+                    toBrutfors(inFiles, Language, whoColled);
                 }
                 buffer.clear();
                 builderBrutforse.delete(0, sizeBuff);
@@ -83,7 +87,7 @@ public class Cryptomethods {
 
         if (whoColled.equals("encrypt")) {
             newNeme = "_encrypt";
-        } else if (whoColled.equals("decrypt")){
+        } else if (whoColled.equals("decrypt")) {
             newNeme = "_decrypt";
         } else {
             newNeme = "_decryptbrutfors";
@@ -105,7 +109,7 @@ public class Cryptomethods {
                 buffer.flip();
 
                 while (buffer.hasRemaining()) {
-                    // перекодируем в формат UTF_8
+
                     builder.append(StandardCharsets.UTF_8.decode(buffer));
                 }
                 buffer.clear();
@@ -114,7 +118,7 @@ public class Cryptomethods {
 
                 for (int i = 0; i < builder.length(); i++) {
                     char temp = builder.charAt(i);
-                    // игнорирование символов которых нет
+
                     if (encryptionTable.get(temp) == null) {
                         builder.setCharAt(i, temp);
                         continue;
@@ -143,8 +147,8 @@ public class Cryptomethods {
 
     protected static void createEncryptAndDecryptTables(int userKey, String whoColled) {
 
-        while (userKey > 60){
-            userKey -=60;
+        while (userKey > MAXUSERKEY) {
+            userKey -= MAXUSERKEY;
         }
 
         if (whoColled.equals("decrypt")) {
@@ -170,8 +174,8 @@ public class Cryptomethods {
 
         if (language.equals("ru")) {
             reader = new FileReader(ALPHADETRU.toFile(), StandardCharsets.UTF_8);
-            // 78
-            arrayOfCharacters = new char[77];
+
+            arrayOfCharacters = new char[LENGTHALPHADETRU];
             while (reader.ready()) {
                 reader.read(arrayOfCharacters);
 
@@ -179,8 +183,8 @@ public class Cryptomethods {
 
         } else if (language.equals("en")) {
             reader = new FileReader(ALPHADETEN.toFile(), StandardCharsets.UTF_8);
-            // 64
-            arrayOfCharacters = new char[63];
+
+            arrayOfCharacters = new char[LENGTHALPHADETEN];
             while (reader.ready()) {
                 reader.read(arrayOfCharacters);
             }
