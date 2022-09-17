@@ -47,7 +47,7 @@ public class Controller {
 
 
     @FXML
-    protected void ChoosePathEncryp() {
+    protected void ChoosePath() {
         FileChooser fileChooser = new FileChooser();
         this.pathFiles = fileChooser.showOpenDialog(null);
     }
@@ -64,10 +64,19 @@ public class Controller {
         Criptoanalizer.createAlphabet(language);
     }
 
-    public int getUserKey() {
+    public int getUserKeyEncryp() {
+        Scanner scanner = new Scanner(this.userKeyEncryp.getText());
+        if (scanner.hasNextInt()) {
+            int userKeyInt = Integer.parseInt(this.userKeyEncryp.getText());
+            return userKeyInt;
+        } else {
+            return 2000;
+        }
+    }
+    public int getUserKeyDecryp() {
         Scanner scanner = new Scanner(this.userKeyDecryp.getText());
         if (scanner.hasNextInt()) {
-            int userKeyInt = Integer.parseInt(String.valueOf(scanner));
+            int userKeyInt = Integer.parseInt(this.userKeyDecryp.getText());
             return userKeyInt;
         } else {
             return 2000;
@@ -85,13 +94,14 @@ public class Controller {
             errorPathEncryp.setText("");
             notStartEncryp.setText("");
         }
-        if (getUserKey() > 1000 || getUserKey() < 0) {
+        if (getUserKeyEncryp() == 2000) {
+            isEmtyKeyEncryp.setText("Неверный ключ!");
+            notStartEncryp.setText("Невозможно запустить шифровку!");
+            couter -= 1;
+        } else if (getUserKeyEncryp() > 1000 || getUserKeyEncryp() < 0) {
             isEmtyKeyEncryp.setText("Неверный ключ! Введите ключ в диапазоне от 1 до 999!");
             notStartEncryp.setText("Невозможно запустить шифровку!");
             couter -= 1;
-        } else if (getUserKey() == 2000) {
-            isEmtyKeyEncryp.setText("Неверный ключ!");
-            notStartEncryp.setText("Невозможно запустить шифровку!");
         } else {
             isEmtyKeyEncryp.setText("");
             notStartEncryp.setText("");
@@ -105,7 +115,8 @@ public class Controller {
             notStartEncryp.setText("");
         }
         if (couter == 3) {
-            Criptoanalizer.encrypt(pathFiles, getUserKey());
+
+            Criptoanalizer.encrypt(pathFiles, getUserKeyEncryp());
             pathFiles = null;
             this.userKeyEncryp = null;
             language = null;
@@ -123,16 +134,17 @@ public class Controller {
             errorPathDecryp.setText("");
             notStartDecryp.setText("");
         }
-        if (getUserKey() > 1000 || getUserKey() < 0) {
-            isEmtyKeyDecryp.setText("Неверный ключ! Введите ключ в диапазоне от 1 до 999!");
-            notStartDecryp.setText("Невозможно запустить разшифровку!");
+        if (getUserKeyDecryp() == 2000) {
+            isEmtyKeyDecryp.setText("Неверный ключ!");
+            notStartDecryp.setText("Невозможно запустить шифровку!");
             couter -= 1;
-        } else if (getUserKey() == 2000) {
-            isEmtyKeyEncryp.setText("Неверный ключ!");
-            notStartEncryp.setText("Невозможно запустить шифровку!");
+        } else if (getUserKeyDecryp() > 1000 || getUserKeyDecryp() < 0) {
+            isEmtyKeyDecryp.setText("Неверный ключ! Введите ключ в диапазоне от 1 до 999!");
+            notStartDecryp.setText("Невозможно запустить шифровку!");
+            couter -= 1;
         } else {
-            isEmtyKeyEncryp.setText("");
-            notStartEncryp.setText("");
+            isEmtyKeyDecryp.setText("");
+            notStartDecryp.setText("");
         }
         if (language == null) {
             notLangDecryp.setText("Выберете язык!");
@@ -144,7 +156,7 @@ public class Controller {
         }
         if (couter == 3) {
 
-            Criptoanalizer.decrypt(pathFiles, getUserKey());
+            Criptoanalizer.decrypt(pathFiles, getUserKeyDecryp());
             pathFiles = null;
             this.userKeyDecryp = null;
             language = null;
