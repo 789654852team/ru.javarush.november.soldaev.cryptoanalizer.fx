@@ -19,7 +19,7 @@
          prefWidth="600.0"
          tabClosingPolicy="UNAVAILABLE"
          xmlns:fx="http://javafx.com/fxml/1"
-         fx:controller="com.example.fx.HelloController"
+         fx:controller="view.Controller"
          xmlns="http://javafx.com/javafx/18">
 
   <tabs>
@@ -66,7 +66,7 @@
                   </Text>
 
                   <TextField layoutX="177.0" layoutY="233.0"
-                  fx:id="userKey"/>
+                  fx:id="userKeyEncryp"/>
                   <Button layoutX="177.0" layoutY="287.0" mnemonicParsing="false" prefHeight="66.0" prefWidth="150.0" text="Зашифровать"
                            onAction="#makeEncryption"/>
 
