@@ -171,7 +171,7 @@ public class Criptoanalizer {
 
     }
 
-    protected static void createDecryptTables(int userKey) {
+    private static void createDecryptTables(int userKey) {
 
         while (userKey > MAXUSERKEY) {
             userKey -= MAXUSERKEY;
@@ -187,13 +187,11 @@ public class Criptoanalizer {
         }
     }
 
-    protected static void createEncryptTables(int userKey) {
+    private static void createEncryptTables(int userKey) {
 
         while (userKey > MAXUSERKEY) {
             userKey -= MAXUSERKEY;
         }
-
-
         for (int i = 0; i < alfafitCharacters.length; i++) {
             if (userKey == alfafitCharacters.length) {
                 userKey = 0;
