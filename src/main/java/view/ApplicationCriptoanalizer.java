@@ -3,14 +3,13 @@ package view;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 
-public class Application extends javafx.application.Application {
+public class ApplicationCriptoanalizer extends javafx.application.Application {
     @Override
     public void start(Stage stage) throws IOException {
 
-        FXMLLoader fxmlLoader = new FXMLLoader(Application.class.getResource("Cryptoanalizerinterfeis.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(ApplicationCriptoanalizer.class.getResource("Cryptoanalizerinterfeis.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         stage.setTitle("CryptoPRO!");
         stage.setScene(scene);

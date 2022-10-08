@@ -6,84 +6,93 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.KeyException;
 import java.util.HashMap;
 
 public class Criptoanalizer {
     private static final int LENGTHALPHADETRU = 77;
     private static final int LENGTHALPHADETEN = 63;
     private static final int SIZEBUFFERS = 2048;
-    private static final int MAXUSERKEY = 60;
+    private static final int MAXUSERKEY = 59;
     private static final int MINUSERKEY = 0;
-    private static StringBuilder builder = new StringBuilder();
-    private static char[] alfafitCharacters;
+    private static final int INDENT = 5;
+    public static int brutforsKey;
     private static long lengthFiles;
     private static long positionRead;
+    private static StringBuilder builder = new StringBuilder();
+    private static char[] alfafitCharacters;
     private static HashMap<Character, Character> encryptionTable = new HashMap<>();
-    public static int brutforsKey;
 
-    public static void encrypt( File outFile, int userKey) throws KeyException {
+
+    public static void encrypt(File outFile, int userKey) throws TranscriptionalException {
+        checkFileFormat(outFile);
         createEncryptTables(userKey);
         String newFileName = "_encrypt";
-        Path path = Paths.get(outFile.getPath());
-        File file = Paths.get(getNewFileName(path.toFile().getAbsolutePath(), newFileName)).toFile();
-        try (FileChannel writeFileChannel = new FileOutputStream(file).getChannel()){
+        File file = getNewFileName(outFile.getAbsolutePath(), newFileName);
+        try (FileChannel writeFileChannel = new FileOutputStream(file).getChannel()) {
             writeFiles(outFile, writeFileChannel);
-        } catch (IOException ignored){
-            System.out.println(ignored.getMessage());
+        } catch (IOException io) {
+            System.out.println(io.getMessage());
         }
     }
 
-    public static void decrypt(File outFile, int userKey) throws KeyException {
+    public static void decrypt(File outFile, int userKey) throws TranscriptionalException {
+        checkFileFormat(outFile);
         createDecryptTables(userKey);
         String newFileName = "_decrypt";
-        Path path = Paths.get(outFile.getPath());
-        File file = Paths.get(getNewFileName(path.toFile().getAbsolutePath(), newFileName)).toFile();
-        try (FileChannel writeFileChannel = new FileOutputStream(file).getChannel()){
+        File file = getNewFileName(outFile.getAbsolutePath(), newFileName);
+        try (FileChannel writeFileChannel = new FileOutputStream(file).getChannel()) {
             writeFiles(outFile, writeFileChannel);
-        } catch (IOException ignored) {
-            System.out.println(ignored.getMessage());
+        } catch (IOException io) {
+            System.out.println(io.getMessage());
         }
     }
 
     private static void writeFiles(File outFile, FileChannel writeFileChannel) throws IOException {
-        boolean encrypt = true;
+        boolean needCoding = true;
         positionRead = 0;
-        while (encrypt) {
+        while (needCoding) {
             readFiles(outFile);
             coding();
-            String someText = builder.toString();
-            ByteBuffer writeBuffer = ByteBuffer.wrap(someText.getBytes(StandardCharsets.UTF_8));
+            String writeText = builder.toString();
+            ByteBuffer writeBuffer = ByteBuffer.wrap(writeText.getBytes(StandardCharsets.UTF_8));
             writeFileChannel.write(writeBuffer);
             writeBuffer.clear();
             builder.delete(0, SIZEBUFFERS);
             if (lengthFiles == 0) {
-                encrypt = false;
+                needCoding = false;
+                encryptionTable.clear();
+                writeBuffer.clear();
             }
         }
     }
 
-    public static void decryptorBrutforse(File outFile) throws IOException, KeyException {
+    public static void decryptorBrutforse(File outFile) throws TranscriptionalException {
+        checkFileFormat(outFile);
         brutforsKey = 0;
+        int matchСounter = 0;
         createDecryptTables(brutforsKey);
-
         boolean needBrutforse = true;
-
         while (needBrutforse) {
             positionRead = 0;
             readFiles(outFile);
             coding();
-            String someText = builder.toString();
-            for (int i = 0; i < someText.length() - 10; i += 1) {
+            String brutforseText = builder.toString();
+            for (int i = 0; i < brutforseText.length() - INDENT; i++) {
                 if (builder.substring(i + 1, i + 3).equals(". ")) {
-                    builder.delete(0, SIZEBUFFERS);
-                    decrypt(outFile, brutforsKey);
-                    needBrutforse = false;
-                    break;
+                    matchСounter++;
+                    if (matchСounter == 3) {
+                        builder.delete(0, SIZEBUFFERS);
+                        decrypt(outFile, brutforsKey);
+                        needBrutforse = false;
+                        break;
+                    }
                 }
             }
             if (needBrutforse) {
                 brutforsKey++;
+                if (brutforsKey > 60){
+                    throw new TranscriptionalException("Простите Brutforse не выполнен! Файл слишком маленький или не найдено совпадений!");
+                }
                 createDecryptTables(brutforsKey);
                 builder.delete(0, SIZEBUFFERS);
             }
@@ -115,8 +124,8 @@ public class Criptoanalizer {
             positionRead += readBuffer.position();
             lengthFiles -= positionRead;
             readBuffer.clear();
-        } catch (IOException ignored) {
-            System.out.println(ignored.getMessage());
+        } catch (IOException io) {
+            System.out.println(io.getMessage());
         }
     }
 
@@ -142,7 +151,8 @@ public class Criptoanalizer {
         }
 
     }
-    private static void createDecryptTables(int userKey) throws KeyException {
+
+    private static void createDecryptTables(int userKey) throws TranscriptionalException {
         checkKey(userKey);
         int shift = userKey;
         for (int i = 0; i < alfafitCharacters.length; i++) {
@@ -154,7 +164,7 @@ public class Criptoanalizer {
         }
     }
 
-    private static void createEncryptTables(int userKey) throws KeyException {
+    private static void createEncryptTables(int userKey) throws TranscriptionalException {
         checkKey(userKey);
         int shift = userKey;
         for (int i = 0; i < alfafitCharacters.length; i++) {
@@ -167,18 +177,33 @@ public class Criptoanalizer {
 
     }
 
-    private static int checkKey(int userKey) throws KeyException {
-        if (userKey < MINUSERKEY){
-            throw new KeyException("The key cannot be less than 0");
-        } else if (userKey > MAXUSERKEY){
-            throw new KeyException("The key cannot be less than 60");
+    private static void checkKey(int userKey) throws TranscriptionalException {
+        if (userKey < MINUSERKEY) {
+            throw new TranscriptionalException("Ключ должен быть больше 0 и состоять только из цифр.");
+        } else if (userKey > MAXUSERKEY) {
+            throw new TranscriptionalException("Ключ не может быть больше 59 и состоять только из цифр.");
         }
-        return userKey;
     }
 
-    private static String getNewFileName(String oldFileName, String name) {
+    private static File getNewFileName(String oldFileName, String name) {
+        int couterFiles = 1;
         int dotIndex = oldFileName.lastIndexOf(".");
-        return oldFileName.substring(0, dotIndex) + name + oldFileName.substring(dotIndex);
+        File file = Paths.get(oldFileName.substring(0, dotIndex) + name + oldFileName.substring(dotIndex)).toFile();
+        while (file.exists()) {
+            couterFiles++;
+            file = Paths.get(oldFileName.substring(0, dotIndex) + name + couterFiles + oldFileName.substring(dotIndex)).toFile();
+        }
+        return file;
     }
 
+    private static void checkFileFormat(File outFile) throws TranscriptionalException {
+        String fileName = outFile.getName();
+        int lengthFile = fileName.length();
+        int indexFormat = fileName.lastIndexOf(".");
+        String checkFormat = fileName.substring(indexFormat, lengthFile);
+        if (!(checkFormat.equals(".txt"))) {
+            throw new TranscriptionalException("Недопустимый формат файла, программа работает только с файлами \"txt\".");
+        }
+    }
 }
+

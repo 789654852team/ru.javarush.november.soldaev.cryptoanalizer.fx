@@ -5,11 +5,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import utils.Criptoanalizer;
-
+import utils.TranscriptionalException;
 import java.io.File;
-
 import java.io.IOException;
-import java.security.KeyException;
 import java.util.Scanner;
 
 public class Controller {
@@ -41,13 +39,9 @@ public class Controller {
     public Text notLangBrutfors;
     @FXML
     public Text notStartBrutfors;
-    @FXML
     public File pathFiles;
-    private final int MAXUSERKEY = 60;
-    private final int MINUSERKEY = 0;
     private String language;
     private int invalidKey = -1;
-
 
     @FXML
     protected void сhoosePath() {
@@ -59,21 +53,17 @@ public class Controller {
     @FXML
     protected void selectionLangRU() throws IOException {
         this.language = "ru";
-        Criptoanalizer.createAlphabet(language);
-
     }
 
     @FXML
     protected void selectionLangEN() throws IOException {
         this.language = "en";
-        Criptoanalizer.createAlphabet(language);
     }
 
     public int getUserKeyEncryp() {
         Scanner scanner = new Scanner(this.userKeyEncryp.getText());
         if (scanner.hasNextInt()) {
-            int userKeyInt = Integer.parseInt(this.userKeyEncryp.getText());
-            return userKeyInt;
+            return Integer.parseInt(this.userKeyEncryp.getText());
         } else {
             return invalidKey;
         }
@@ -82,110 +72,97 @@ public class Controller {
     public int getUserKeyDecryp() {
         Scanner scanner = new Scanner(this.userKeyDecryp.getText());
         if (scanner.hasNextInt()) {
-            int userKeyInt = Integer.parseInt(this.userKeyDecryp.getText());
-            return userKeyInt;
+            return Integer.parseInt(this.userKeyDecryp.getText());
         } else {
             return invalidKey;
         }
     }
 
     @FXML
-    public void makeEncryption() throws IOException, KeyException {
-        int conditionCounter = 3;
+    public void makeEncryption() throws IOException {
+        int conditionCounter = 2;
         if (pathFiles == null) {
             errorPathEncryp.setText("Ошибка выберете!");
             notStartEncryp.setText("Невозможно запустить шифровку!");
-            conditionCounter -= 1;
+            conditionCounter--;
         } else {
             if (pathFiles.length() < 1) {
                 errorPathEncryp.setText("Файл пуст!");
                 notStartEncryp.setText("Невозможно запустить Brut fors!");
-                conditionCounter -= 1;
+                conditionCounter--;
             } else {
                 errorPathEncryp.setText("");
                 notStartEncryp.setText("");
             }
         }
-        if (getUserKeyEncryp() == invalidKey) {
-            isEmtyKeyEncryp.setText("Неверный ключ!");
-            notStartEncryp.setText("Невозможно запустить шифровку!");
-            conditionCounter -= 1;
-        } else if (getUserKeyEncryp() > MAXUSERKEY || getUserKeyEncryp() < MINUSERKEY) {
-            isEmtyKeyEncryp.setText("Неверный ключ! Введите ключ в диапазоне от 1 до 60!");
-            notStartEncryp.setText("Невозможно запустить шифровку!");
-            conditionCounter -= 1;
-        } else {
-            isEmtyKeyEncryp.setText("");
-            notStartEncryp.setText("");
-        }
+
         if (language == null) {
             notLangEncryp.setText("Выберете язык!");
             notStartEncryp.setText("Невозможно запустить шифровку!");
-            conditionCounter -= 1;
+            conditionCounter--;
         } else {
             notLangEncryp.setText("");
             notStartEncryp.setText("");
         }
-        if (conditionCounter == 3) {
-            Criptoanalizer.encrypt(pathFiles, getUserKeyEncryp());
+        if (conditionCounter == 2) {
+            try {
+                Criptoanalizer.createAlphabet(language);
+                Criptoanalizer.encrypt(pathFiles, getUserKeyEncryp());
+                language = null;
+            } catch (TranscriptionalException e) {
+                notStartEncryp.setText(e.getMessage());
+            }
         }
     }
 
     @FXML
-    public void makeDecryption() throws IOException, KeyException {
-        int conditionCounter = 3;
+    public void makeDecryption() throws IOException {
+        int conditionCounter = 2;
         if (pathFiles == null) {
             errorPathDecryp.setText("Ошибка выберете файл!");
             notStartDecryp.setText("Невозможно запустить разшифровку!");
-            conditionCounter -= 1;
+            conditionCounter--;
         } else {
             if (pathFiles.length() < 1) {
-                isEmtyKeyDecryp.setText("Файл пуст!");
+                errorPathDecryp.setText("Файл пуст!");
                 notStartDecryp.setText("Невозможно запустить Brutfors!");
-                conditionCounter -= 1;
+                conditionCounter--;
             } else {
                 isEmtyKeyDecryp.setText("");
                 notStartDecryp.setText("");
             }
         }
-        if (getUserKeyDecryp() == invalidKey) {
-            isEmtyKeyDecryp.setText("Неверный ключ!");
-            notStartDecryp.setText("Невозможно запустить шифровку!");
-            conditionCounter -= 1;
-        } else if (getUserKeyDecryp() > MAXUSERKEY || getUserKeyDecryp() < MINUSERKEY) {
-            isEmtyKeyDecryp.setText("Неверный ключ! Введите ключ в диапазоне от 1 до 60!");
-            notStartDecryp.setText("Невозможно запустить шифровку!");
-            conditionCounter -= 1;
-        } else {
-            isEmtyKeyDecryp.setText("");
-            notStartDecryp.setText("");
-        }
         if (language == null) {
             notLangDecryp.setText("Выберете язык!");
             notStartDecryp.setText("Невозможно запустить разшифровку!");
-            conditionCounter -= 1;
+            conditionCounter--;
         } else {
             notLangDecryp.setText("");
             notStartDecryp.setText("");
         }
-        if (conditionCounter == 3) {
-            Criptoanalizer decryption = new Criptoanalizer();
-            decryption.decrypt(pathFiles, getUserKeyDecryp());
+        if (conditionCounter == 2) {
+            try {
+                Criptoanalizer.createAlphabet(language);
+                Criptoanalizer.decrypt(pathFiles, getUserKeyDecryp());
+                language = null;
+            } catch (TranscriptionalException e) {
+                notStartDecryp.setText(e.getMessage());
+            }
         }
     }
 
     @FXML
-    public void makeBrutfors() throws IOException, KeyException {
+    public void makeBrutfors() throws IOException {
         int conditionCounter = 2;
         if (pathFiles == null) {
             errorPathBrutfors.setText("Ошибка выберете файл!");
             notStartBrutfors.setText("Невозможно запустить Brutfors!");
-            conditionCounter -= 1;
+            conditionCounter--;
         } else {
             if (pathFiles.length() < 1) {
                 errorPathBrutfors.setText("Файл пуст!");
                 notStartBrutfors.setText("Невозможно запустить Brutfors!");
-                conditionCounter -= 1;
+                conditionCounter--;
             } else {
                 errorPathBrutfors.setText("");
                 notStartBrutfors.setText("");
@@ -194,14 +171,20 @@ public class Controller {
         if (language == null) {
             notLangBrutfors.setText("Выберете язык!");
             notStartBrutfors.setText("Невозможно запустить Brutfors!");
-            conditionCounter -= 1;
+            conditionCounter--;
         } else {
             notLangBrutfors.setText("");
             notStartBrutfors.setText("");
         }
         if (conditionCounter == 2) {
-            Criptoanalizer.decryptorBrutforse(pathFiles);
-            brutforsKey.setText(String.valueOf(Criptoanalizer.brutforsKey));
+            try {
+                Criptoanalizer.createAlphabet(language);
+                Criptoanalizer.decryptorBrutforse(pathFiles);
+                brutforsKey.setText(String.valueOf(Criptoanalizer.brutforsKey));
+                language = null;
+            } catch (TranscriptionalException e) {
+                notStartBrutfors.setText(e.getMessage());
+            }
         }
     }
 
