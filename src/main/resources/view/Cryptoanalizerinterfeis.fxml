@@ -202,7 +202,7 @@
                   </Text>
                   <Button layoutX="14.0" layoutY="193.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="269.0" text="Начать Brute force"
                           onAction="#makeBrutfors"/>
-                  <Text layoutX="15.0" layoutY="279.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Пердпологаемый ключ:">
+                  <Text layoutX="15.0" layoutY="279.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Пердполагаемый ключ:">
                      <font>
                         <Font size="20.0" />
                      </font>

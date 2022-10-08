@@ -6,97 +6,75 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
+import java.security.KeyException;
 import java.util.HashMap;
 
 public class Criptoanalizer {
-
     private static final int LENGTHALPHADETRU = 77;
     private static final int LENGTHALPHADETEN = 63;
-    private static final int SIZEBUFFERS = 1024;
+    private static final int SIZEBUFFERS = 2048;
     private static final int MAXUSERKEY = 60;
+    private static final int MINUSERKEY = 0;
     private static StringBuilder builder = new StringBuilder();
-    private static String newFileName;
     private static char[] alfafitCharacters;
     private static long lengthFiles;
     private static long positionRead;
     private static HashMap<Character, Character> encryptionTable = new HashMap<>();
     public static int brutforsKey;
 
-    public static void encrypt(File outFile, int userKey) throws IOException {
-
+    public static void encrypt( File outFile, int userKey) throws KeyException {
         createEncryptTables(userKey);
-        newFileName = "_encrypt";
+        String newFileName = "_encrypt";
         Path path = Paths.get(outFile.getPath());
         File file = Paths.get(getNewFileName(path.toFile().getAbsolutePath(), newFileName)).toFile();
-        FileChannel writeFileChannel = new FileOutputStream(file).getChannel();
-
-        boolean write = true;
-        positionRead = 0;
-
-        while (write) {
-            readFiles(outFile);
-
-            coding();
-
-            String someText = builder.toString();
-            ByteBuffer writeBuffer = ByteBuffer.wrap(someText.getBytes(StandardCharsets.UTF_8));
-            writeFileChannel.write(writeBuffer);
-            writeBuffer.clear();
-            builder.delete(0, SIZEBUFFERS);
-
-            if (lengthFiles == 0) {
-                write = false;
-            }
+        try (FileChannel writeFileChannel = new FileOutputStream(file).getChannel()){
+            writeFiles(outFile, writeFileChannel);
+        } catch (IOException ignored){
+            System.out.println(ignored.getMessage());
         }
-        writeFileChannel.close();
-
     }
 
-    public static void decrypt(File outFile, int userKey) throws IOException {
+    public static void decrypt(File outFile, int userKey) throws KeyException {
         createDecryptTables(userKey);
-
-        newFileName = "_decrypt";
+        String newFileName = "_decrypt";
         Path path = Paths.get(outFile.getPath());
         File file = Paths.get(getNewFileName(path.toFile().getAbsolutePath(), newFileName)).toFile();
-        FileChannel writeFileChannel = new FileOutputStream(file).getChannel();
+        try (FileChannel writeFileChannel = new FileOutputStream(file).getChannel()){
+            writeFiles(outFile, writeFileChannel);
+        } catch (IOException ignored) {
+            System.out.println(ignored.getMessage());
+        }
+    }
 
-        boolean decrypt = true;
+    private static void writeFiles(File outFile, FileChannel writeFileChannel) throws IOException {
+        boolean encrypt = true;
         positionRead = 0;
-        while (decrypt) {
+        while (encrypt) {
             readFiles(outFile);
-
             coding();
-
             String someText = builder.toString();
             ByteBuffer writeBuffer = ByteBuffer.wrap(someText.getBytes(StandardCharsets.UTF_8));
             writeFileChannel.write(writeBuffer);
             writeBuffer.clear();
             builder.delete(0, SIZEBUFFERS);
-
             if (lengthFiles == 0) {
-                decrypt = false;
+                encrypt = false;
             }
         }
-        writeFileChannel.close();
     }
 
-    public static void decryptorBrutforse(File outFile) throws IOException {
-
-        brutforsKey = 1;
+    public static void decryptorBrutforse(File outFile) throws IOException, KeyException {
+        brutforsKey = 0;
         createDecryptTables(brutforsKey);
-
-        newFileName = "decryptbrutfors";
 
         boolean needBrutforse = true;
 
         while (needBrutforse) {
+            positionRead = 0;
             readFiles(outFile);
             coding();
-
             String someText = builder.toString();
-
-            for (int i = 0; i < someText.length() - 10; i += 2) {
+            for (int i = 0; i < someText.length() - 10; i += 1) {
                 if (builder.substring(i + 1, i + 3).equals(". ")) {
                     builder.delete(0, SIZEBUFFERS);
                     decrypt(outFile, brutforsKey);
@@ -112,7 +90,6 @@ public class Criptoanalizer {
         }
     }
 
-
     private static void coding() {
         for (int i = 0; i < builder.length(); i++) {
             char temp = builder.charAt(i);
@@ -124,34 +101,29 @@ public class Criptoanalizer {
 
     }
 
-
     private static void readFiles(File readFiles) {
 
         try (FileChannel readFileChannel = new FileInputStream(readFiles).getChannel()) {
-
             readFileChannel.position(positionRead);
             lengthFiles = readFileChannel.size();
-
             ByteBuffer readBuffer = ByteBuffer.allocate(SIZEBUFFERS);
             readFileChannel.read(readBuffer);
             readBuffer.flip();
-
             while (readBuffer.hasRemaining()) {
                 builder.append(StandardCharsets.UTF_8.decode(readBuffer));
             }
-
             positionRead += readBuffer.position();
             lengthFiles -= positionRead;
             readBuffer.clear();
-
         } catch (IOException ignored) {
-
+            System.out.println(ignored.getMessage());
         }
     }
 
     public static void createAlphabet(String language) throws IOException {
-        Path alphadetru = Path.of("src/alfafitCriptoanalizer/alfafitru.txt");
-        Path alphadeten = Path.of("src/alfafitCriptoanalizer/alfafiten.txt");
+
+        Path alphadetru = Path.of("src/main/resources/alfafitru.txt");
+        Path alphadeten = Path.of("src/main/resources/alfafiten.txt");
 
         if (language.equals("ru")) {
             FileReader reader = new FileReader(alphadetru.toFile(), StandardCharsets.UTF_8);
@@ -170,36 +142,38 @@ public class Criptoanalizer {
         }
 
     }
-
-    private static void createDecryptTables(int userKey) {
-
-        while (userKey > MAXUSERKEY) {
-            userKey -= MAXUSERKEY;
-        }
-
+    private static void createDecryptTables(int userKey) throws KeyException {
+        checkKey(userKey);
+        int shift = userKey;
         for (int i = 0; i < alfafitCharacters.length; i++) {
-            if (userKey == alfafitCharacters.length) {
-                userKey = 0;
+            if (shift == alfafitCharacters.length) {
+                shift = 0;
             }
-            encryptionTable.put(alfafitCharacters[userKey], alfafitCharacters[i]);
-            userKey++;
-
+            encryptionTable.put(alfafitCharacters[shift], alfafitCharacters[i]);
+            shift++;
         }
     }
 
-    private static void createEncryptTables(int userKey) {
-
-        while (userKey > MAXUSERKEY) {
-            userKey -= MAXUSERKEY;
-        }
+    private static void createEncryptTables(int userKey) throws KeyException {
+        checkKey(userKey);
+        int shift = userKey;
         for (int i = 0; i < alfafitCharacters.length; i++) {
-            if (userKey == alfafitCharacters.length) {
-                userKey = 0;
+            if (shift == alfafitCharacters.length) {
+                shift = 0;
             }
-            encryptionTable.put(alfafitCharacters[i], alfafitCharacters[userKey]);
-            userKey++;
+            encryptionTable.put(alfafitCharacters[i], alfafitCharacters[shift]);
+            shift++;
         }
 
+    }
+
+    private static int checkKey(int userKey) throws KeyException {
+        if (userKey < MINUSERKEY){
+            throw new KeyException("The key cannot be less than 0");
+        } else if (userKey > MAXUSERKEY){
+            throw new KeyException("The key cannot be less than 60");
+        }
+        return userKey;
     }
 
     private static String getNewFileName(String oldFileName, String name) {

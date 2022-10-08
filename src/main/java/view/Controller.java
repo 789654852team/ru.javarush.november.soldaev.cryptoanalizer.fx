@@ -9,6 +9,7 @@ import utils.Criptoanalizer;
 import java.io.File;
 
 import java.io.IOException;
+import java.security.KeyException;
 import java.util.Scanner;
 
 public class Controller {
@@ -41,21 +42,25 @@ public class Controller {
     @FXML
     public Text notStartBrutfors;
     @FXML
-    private File pathFiles;
-    @FXML
+    public File pathFiles;
+    private final int MAXUSERKEY = 60;
+    private final int MINUSERKEY = 0;
     private String language;
+    private int invalidKey = -1;
 
 
     @FXML
     protected void сhoosePath() {
         FileChooser fileChooser = new FileChooser();
         this.pathFiles = fileChooser.showOpenDialog(null);
+
     }
 
     @FXML
     protected void selectionLangRU() throws IOException {
         this.language = "ru";
         Criptoanalizer.createAlphabet(language);
+
     }
 
     @FXML
@@ -70,7 +75,7 @@ public class Controller {
             int userKeyInt = Integer.parseInt(this.userKeyEncryp.getText());
             return userKeyInt;
         } else {
-            return 2000;
+            return invalidKey;
         }
     }
 
@@ -80,35 +85,35 @@ public class Controller {
             int userKeyInt = Integer.parseInt(this.userKeyDecryp.getText());
             return userKeyInt;
         } else {
-            return 2000;
+            return invalidKey;
         }
     }
 
     @FXML
-    public void makeEncryption() throws IOException {
-        int couter = 3;
+    public void makeEncryption() throws IOException, KeyException {
+        int conditionCounter = 3;
         if (pathFiles == null) {
             errorPathEncryp.setText("Ошибка выберете!");
             notStartEncryp.setText("Невозможно запустить шифровку!");
-            couter -= 1;
+            conditionCounter -= 1;
         } else {
             if (pathFiles.length() < 1) {
                 errorPathEncryp.setText("Файл пуст!");
                 notStartEncryp.setText("Невозможно запустить Brut fors!");
-                couter -= 1;
+                conditionCounter -= 1;
             } else {
                 errorPathEncryp.setText("");
                 notStartEncryp.setText("");
             }
         }
-        if (getUserKeyEncryp() == 2000) {
+        if (getUserKeyEncryp() == invalidKey) {
             isEmtyKeyEncryp.setText("Неверный ключ!");
             notStartEncryp.setText("Невозможно запустить шифровку!");
-            couter -= 1;
-        } else if (getUserKeyEncryp() > 1000 || getUserKeyEncryp() < 0) {
-            isEmtyKeyEncryp.setText("Неверный ключ! Введите ключ в диапазоне от 1 до 999!");
+            conditionCounter -= 1;
+        } else if (getUserKeyEncryp() > MAXUSERKEY || getUserKeyEncryp() < MINUSERKEY) {
+            isEmtyKeyEncryp.setText("Неверный ключ! Введите ключ в диапазоне от 1 до 60!");
             notStartEncryp.setText("Невозможно запустить шифровку!");
-            couter -= 1;
+            conditionCounter -= 1;
         } else {
             isEmtyKeyEncryp.setText("");
             notStartEncryp.setText("");
@@ -116,41 +121,41 @@ public class Controller {
         if (language == null) {
             notLangEncryp.setText("Выберете язык!");
             notStartEncryp.setText("Невозможно запустить шифровку!");
-            couter -= 1;
+            conditionCounter -= 1;
         } else {
             notLangEncryp.setText("");
             notStartEncryp.setText("");
         }
-        if (couter == 3) {
+        if (conditionCounter == 3) {
             Criptoanalizer.encrypt(pathFiles, getUserKeyEncryp());
         }
     }
 
     @FXML
-    public void makeDecryption() throws IOException {
-        int couter = 3;
+    public void makeDecryption() throws IOException, KeyException {
+        int conditionCounter = 3;
         if (pathFiles == null) {
             errorPathDecryp.setText("Ошибка выберете файл!");
             notStartDecryp.setText("Невозможно запустить разшифровку!");
-            couter -= 1;
+            conditionCounter -= 1;
         } else {
             if (pathFiles.length() < 1) {
                 isEmtyKeyDecryp.setText("Файл пуст!");
-                notStartDecryp.setText("Невозможно запустить Brut fors!");
-                couter -= 1;
+                notStartDecryp.setText("Невозможно запустить Brutfors!");
+                conditionCounter -= 1;
             } else {
                 isEmtyKeyDecryp.setText("");
                 notStartDecryp.setText("");
             }
         }
-        if (getUserKeyDecryp() == 2000) {
+        if (getUserKeyDecryp() == invalidKey) {
             isEmtyKeyDecryp.setText("Неверный ключ!");
             notStartDecryp.setText("Невозможно запустить шифровку!");
-            couter -= 1;
-        } else if (getUserKeyDecryp() > 1000 || getUserKeyDecryp() < 0) {
-            isEmtyKeyDecryp.setText("Неверный ключ! Введите ключ в диапазоне от 1 до 999!");
+            conditionCounter -= 1;
+        } else if (getUserKeyDecryp() > MAXUSERKEY || getUserKeyDecryp() < MINUSERKEY) {
+            isEmtyKeyDecryp.setText("Неверный ключ! Введите ключ в диапазоне от 1 до 60!");
             notStartDecryp.setText("Невозможно запустить шифровку!");
-            couter -= 1;
+            conditionCounter -= 1;
         } else {
             isEmtyKeyDecryp.setText("");
             notStartDecryp.setText("");
@@ -158,30 +163,29 @@ public class Controller {
         if (language == null) {
             notLangDecryp.setText("Выберете язык!");
             notStartDecryp.setText("Невозможно запустить разшифровку!");
-            couter -= 1;
+            conditionCounter -= 1;
         } else {
             notLangDecryp.setText("");
             notStartDecryp.setText("");
         }
-        if (couter == 3) {
-
-            Criptoanalizer.decrypt(pathFiles, getUserKeyDecryp());
-
+        if (conditionCounter == 3) {
+            Criptoanalizer decryption = new Criptoanalizer();
+            decryption.decrypt(pathFiles, getUserKeyDecryp());
         }
     }
 
     @FXML
-    public void makeBrutfors() throws IOException {
-        int couter = 2;
+    public void makeBrutfors() throws IOException, KeyException {
+        int conditionCounter = 2;
         if (pathFiles == null) {
             errorPathBrutfors.setText("Ошибка выберете файл!");
-            notStartBrutfors.setText("Невозможно запустить Brut fors!");
-            couter -= 1;
+            notStartBrutfors.setText("Невозможно запустить Brutfors!");
+            conditionCounter -= 1;
         } else {
             if (pathFiles.length() < 1) {
                 errorPathBrutfors.setText("Файл пуст!");
-                notStartBrutfors.setText("Невозможно запустить Brut fors!");
-                couter -= 1;
+                notStartBrutfors.setText("Невозможно запустить Brutfors!");
+                conditionCounter -= 1;
             } else {
                 errorPathBrutfors.setText("");
                 notStartBrutfors.setText("");
@@ -189,13 +193,13 @@ public class Controller {
         }
         if (language == null) {
             notLangBrutfors.setText("Выберете язык!");
-            notStartBrutfors.setText("Невозможно запустить Brut fors!");
-            couter -= 1;
+            notStartBrutfors.setText("Невозможно запустить Brutfors!");
+            conditionCounter -= 1;
         } else {
             notLangBrutfors.setText("");
             notStartBrutfors.setText("");
         }
-        if (couter == 2) {
+        if (conditionCounter == 2) {
             Criptoanalizer.decryptorBrutforse(pathFiles);
             brutforsKey.setText(String.valueOf(Criptoanalizer.brutforsKey));
         }
