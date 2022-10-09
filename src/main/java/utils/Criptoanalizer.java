@@ -12,7 +12,7 @@ import java.util.HashMap;
 public class Criptoanalizer {
     private static final int LENGTHALPHADETRU = 77;
     private static final int LENGTHALPHADETEN = 63;
-    private static final int SIZEBUFFERS = 1024;
+    private static final int SIZEBUFFERS = 4096;
     private static final int MAXUSERKEY = 60;
     private static final int MINUSERKEY = 0;
     private static final int INDENT = 5;
