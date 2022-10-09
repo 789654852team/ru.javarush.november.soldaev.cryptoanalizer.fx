@@ -6,13 +6,14 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Criptoanalizer {
     private static final int LENGTHALPHADETRU = 77;
     private static final int LENGTHALPHADETEN = 63;
-    private static final int SIZEBUFFERS = 2048;
-    private static final int MAXUSERKEY = 59;
+    private static final int SIZEBUFFERS = 1024;
+    private static final int MAXUSERKEY = 60;
     private static final int MINUSERKEY = 0;
     private static final int INDENT = 5;
     public static int brutforsKey;
@@ -22,81 +23,88 @@ public class Criptoanalizer {
     private static char[] alfafitCharacters;
     private static HashMap<Character, Character> encryptionTable = new HashMap<>();
 
-
-    public static void encrypt(File outFile, int userKey) throws TranscriptionalException {
+    public static void encrypt(File outFile, int userKey) throws TranscriptionalException, IOException {
         checkFileFormat(outFile);
         createEncryptTables(userKey);
         String newFileName = "_encrypt";
-        File file = getNewFileName(outFile.getAbsolutePath(), newFileName);
-        try (FileChannel writeFileChannel = new FileOutputStream(file).getChannel()) {
-            writeFiles(outFile, writeFileChannel);
-        } catch (IOException io) {
-            System.out.println(io.getMessage());
-        }
+        writeFiles(outFile, newFileName);
     }
 
-    public static void decrypt(File outFile, int userKey) throws TranscriptionalException {
+    public static void decrypt(File outFile, int userKey) throws TranscriptionalException, IOException {
         checkFileFormat(outFile);
         createDecryptTables(userKey);
         String newFileName = "_decrypt";
+        writeFiles(outFile, newFileName);
+    }
+
+    private static void writeFiles(File outFile, String newFileName) throws IOException {
         File file = getNewFileName(outFile.getAbsolutePath(), newFileName);
         try (FileChannel writeFileChannel = new FileOutputStream(file).getChannel()) {
-            writeFiles(outFile, writeFileChannel);
-        } catch (IOException io) {
-            System.out.println(io.getMessage());
-        }
-    }
-
-    private static void writeFiles(File outFile, FileChannel writeFileChannel) throws IOException {
-        boolean needCoding = true;
-        positionRead = 0;
-        while (needCoding) {
-            readFiles(outFile);
-            coding();
-            String writeText = builder.toString();
-            ByteBuffer writeBuffer = ByteBuffer.wrap(writeText.getBytes(StandardCharsets.UTF_8));
-            writeFileChannel.write(writeBuffer);
-            writeBuffer.clear();
-            builder.delete(0, SIZEBUFFERS);
-            if (lengthFiles == 0) {
-                needCoding = false;
-                encryptionTable.clear();
+            boolean needCoding = true;
+            positionRead = 0;
+            while (needCoding) {
+                readFiles(outFile);
+                coding();
+                String writeText = builder.toString();
+                ByteBuffer writeBuffer = ByteBuffer.wrap(writeText.getBytes(StandardCharsets.UTF_8));
+                writeFileChannel.write(writeBuffer);
                 writeBuffer.clear();
+                builder.delete(0, SIZEBUFFERS);
+                if (lengthFiles == 0) {
+                    needCoding = false;
+                    encryptionTable.clear();
+                    writeBuffer.clear();
+                }
             }
+        } catch (IOException io) {
+            throw new IOException();
         }
+
     }
 
-    public static void decryptorBrutforse(File outFile) throws TranscriptionalException {
+    public static void decryptorBrutforse(File outFile) throws TranscriptionalException, IOException {
         checkFileFormat(outFile);
         brutforsKey = 0;
-        int matchСounter = 0;
         createDecryptTables(brutforsKey);
         boolean needBrutforse = true;
         while (needBrutforse) {
             positionRead = 0;
             readFiles(outFile);
             coding();
-            String brutforseText = builder.toString();
-            for (int i = 0; i < brutforseText.length() - INDENT; i++) {
-                if (builder.substring(i + 1, i + 3).equals(". ")) {
-                    matchСounter++;
-                    if (matchСounter == 3) {
-                        builder.delete(0, SIZEBUFFERS);
-                        decrypt(outFile, brutforsKey);
-                        needBrutforse = false;
-                        break;
-                    }
-                }
-            }
+            needBrutforse = findMatch();
             if (needBrutforse) {
                 brutforsKey++;
-                if (brutforsKey > 60){
+                if (brutforsKey > 60) {
                     throw new TranscriptionalException("Простите Brutforse не выполнен! Файл слишком маленький или не найдено совпадений!");
                 }
                 createDecryptTables(brutforsKey);
                 builder.delete(0, SIZEBUFFERS);
+            } else {
+                builder.delete(0, SIZEBUFFERS);
+                decrypt(outFile, brutforsKey);
             }
         }
+    }
+    private static boolean findMatch (){
+        int matchСounter = 0;
+        String brutforseText = builder.toString();
+        for (int i = 1; i < brutforseText.length() - INDENT; i++) {
+            if (builder.substring(i, i + 2).equals(". ")) {
+                matchСounter++;
+                if (matchСounter == 3) {
+                    break;
+                }
+            }
+        }
+        for (int i = 1; i < brutforseText.length() - INDENT; i++) {
+            if (builder.substring(i, i + 2).equals(", ")) {
+                matchСounter++;
+                if (matchСounter == 6) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private static void coding() {
@@ -110,7 +118,7 @@ public class Criptoanalizer {
 
     }
 
-    private static void readFiles(File readFiles) {
+    private static void readFiles(File readFiles) throws IOException {
 
         try (FileChannel readFileChannel = new FileInputStream(readFiles).getChannel()) {
             readFileChannel.position(positionRead);
@@ -125,25 +133,24 @@ public class Criptoanalizer {
             lengthFiles -= positionRead;
             readBuffer.clear();
         } catch (IOException io) {
-            System.out.println(io.getMessage());
+            throw new IOException();
         }
     }
 
     public static void createAlphabet(String language) throws IOException {
-
         Path alphadetru = Path.of("src/main/resources/alfafitru.txt");
         Path alphadeten = Path.of("src/main/resources/alfafiten.txt");
-
+        ArrayList<Character> characters = new ArrayList<>();
         if (language.equals("ru")) {
             FileReader reader = new FileReader(alphadetru.toFile(), StandardCharsets.UTF_8);
-
             alfafitCharacters = new char[LENGTHALPHADETRU];
             while (reader.ready()) {
                 reader.read(alfafitCharacters);
             }
+
+
         } else if (language.equals("en")) {
             FileReader reader = new FileReader(alphadeten.toFile(), StandardCharsets.UTF_8);
-
             alfafitCharacters = new char[LENGTHALPHADETEN];
             while (reader.ready()) {
                 reader.read(alfafitCharacters);
@@ -179,9 +186,9 @@ public class Criptoanalizer {
 
     private static void checkKey(int userKey) throws TranscriptionalException {
         if (userKey < MINUSERKEY) {
-            throw new TranscriptionalException("Ключ должен быть больше 0 и состоять только из цифр.");
+            throw new TranscriptionalException(String.format("Ключ должен быть больше %d и состоять только из цифр.", MINUSERKEY));
         } else if (userKey > MAXUSERKEY) {
-            throw new TranscriptionalException("Ключ не может быть больше 59 и состоять только из цифр.");
+            throw new TranscriptionalException(String.format("Ключ не может быть больше %d и состоять только из цифр.", MAXUSERKEY));
         }
     }
 
